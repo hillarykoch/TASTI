@@ -7,8 +7,8 @@ Install from GitHub with:
 
 ```{r}
 library(devtools)
-install_github("hillarykoch/powerTCR")
-library(powerTCR)
+install_github("hillarykoch/TASTI")
+library(TASTI)
 ```
 
 ## Citation
