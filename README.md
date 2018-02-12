@@ -16,7 +16,7 @@ This package is currently under development. It does not provide all functions n
 
 ## Model visualization
 
-![alt text](https://github.com/hillarykoch/TASTI/abc_combos.pdf)
+![alt text](https://github.com/hillarykoch/TASTI/blob/master/abc_combos.pdf)
 
 ## Citation
 
