@@ -14,6 +14,10 @@ library(TASTI)
 
 This package is currently under development. It does not provide all functions necessary for the centrally proposed analyses.
 
+## Model visualization
+
+![alt text](https://github.com/hillarykoch/TASTI/abc_combos.pdf)
+
 ## Citation
 
 Paper yet to appear.
