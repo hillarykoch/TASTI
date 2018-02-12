@@ -5,9 +5,11 @@ This R package uses maximum likelihood methods to construct species trees from g
 ## Installation
 Install from GitHub with:
 
+```{r}
 library(devtools)
 install_github("hillarykoch/powerTCR")
 library(powerTCR)
+```
 
 ## Citation
 
