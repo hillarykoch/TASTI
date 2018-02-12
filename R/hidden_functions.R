@@ -430,3 +430,185 @@ topFunc <- function(par, method, data, theta, N, tauBound, cABC, l){
 
     return(-ll[l])
 }
+
+blOptimFunc <- function(par, data, method, cABC, tau1bound, tau2bound, N, theta, l){
+        par <- exp(par)
+        if(!(par[1] >= 0 & par[1] <= tau1bound)){
+            return(Inf)
+        }
+
+        if(!(par[2] >=0 & par[2] <= tau2bound)){
+            return(Inf)
+        }
+
+        if(!(par[3] >= 0 & par[3] <= 4*N/theta)){
+            return(Inf)
+        }
+
+        tau1 <- min(par[1:2])
+        tau2 <- max(par[1:2])
+        m <- par[3]
+        t1.vec <- data[,4]
+        t2.vec <- data[,5]
+
+        ABC.idx <- data[,1] == 1
+        BCA.idx <- data[,2] == 1
+        ACB.idx <- data[,3] == 1
+
+        QAB <- matrix(data = c(-2*m, 0, m, m, 0, 0,
+                               0, -2*m, m, m, 0, 0,
+                               m, m, -2*m-cABC, 0, cABC, 0,
+                               m, m, 0, -2*m-cABC, 0, cABC,
+                               0, 0, 0, 0, -m, m,
+                               0, 0, 0, 0, m, -m), nrow = 6, byrow = TRUE)
+
+        QABC <- matrix(data = c(-3*m-3*(cABC + cABC + cABC), m, m, m, 0, 0, 0,
+                                0, 3*cABC, 0, 0, 0, 3*cABC, 0, 0, 0, 3*cABC, 0, 0,
+                                0, 0, 0, m,-3*m-cABC,0,0,m,m,0,0,0,cABC,0,0,0,0,0,
+                                0,0,0,0,0,0,0,m,0,-3*m-cABC,0,m,0,m,0,0,0,0,0,0,
+                                cABC,0,0,0,0,0,0,0,0,m,0,0,-3*m-cABC,0,m,m,0,0,0,0,
+                                0,0,0,0,0,0,cABC,0,0,0,0,0,m,m,0,-3*m-cABC,0,0,m,0,
+                                0,0,0,0,0,0,0,0,0,cABC,0,0,0,0,m,0,m,0,-3*m-cABC,0,
+                                m,0,0,0,0,0,0,cABC,0,0,0,0,0,0,0,0,0,m,m,0,0,
+                                -3*m-cABC,m,0,0,cABC,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                                m,m,m,-3*m-3*(cABC + cABC + cABC),0,0,0,3*cABC,0,0,
+                                0,3*cABC,0,0,0,3*cABC,0,0,0,0,0,0,0,0,0,0,-2*m-cABC,
+                                m,m,0,0,0,0,0,0,0,0,0,cABC,0,0,0,0,0,0,0,0,0,m,
+                                -2*m,0,m,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,m,0,
+                                -2*m,m,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,m,m,
+                                -2*m-cABC,0,0,0,0,0,0,0,0,0,cABC,0,0,0,0,0,0,0,0,0,
+                                0,0,0,-2*m-cABC,m,m,0,0,0,0,0,cABC,0,0,0,0,0,0,0,0,
+                                0,0,0,0,0,m,-2*m,0,m,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                                0,0,0,m,0,-2*m,m,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                                0,0,m,m,-2*m-cABC,0,0,0,0,0,cABC,0,0,0,0,0,0,0,0,0,
+                                0,0,0,0,0,0,0,-2*m-cABC,m,m,0,cABC,0,0,0,0,0,0,0,0,
+                                0,0,0,0,0,0,0,0,0,m,-2*m,0,m,0,0,0,0,0,0,0,0,0,0,0,
+                                0,0,0,0,0,0,0,m,0,-2*m,m,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                                0,0,0,0,0,0,m,m,-2*m-cABC,0,cABC,0,0,0,0,0,0,0,0,0,
+                                0,0,0,0,0,0,0,0,0,0,0,-m,m,0,0,0,0,0,0,0,0,0,0,0,0,
+                                0,0,0,0,0,0,0,0,m,-m), nrow = 22, byrow = TRUE)
+
+        QAB <- matrix(unlist(QAB), nrow = 6)
+        QABC <- matrix(unlist(QABC), nrow = 22)
+        epsilon <- 10^(-15)
+        reps <- nrow(data)
+
+        ll.raw <- matrix(rep(NA,3*reps), ncol = 3)
+        for(i in 1:reps){
+            ll.raw[i,1] <- log(f1Grid(t1.vec[i], t2.vec[i],
+                                      tau1, tau2, QAB, QABC, cABC) +
+                                   f2Grid(t1.vec[i], t2.vec[i],
+                                          tau1, tau2, QAB, QABC, cABC) + epsilon)
+            ll.raw[i,2] <- log(f3Grid(t1.vec[i], t2.vec[i],
+                                      tau1, tau2, QAB, QABC, cABC) + epsilon)
+            ll.raw[i,3] <- log(f4Grid(t1.vec[i], t2.vec[i],
+                                      tau1, tau2, QAB, QABC, cABC) + epsilon)
+        }
+
+        ll.ABC <- sum(ll.raw[ABC.idx,1]) +
+            sum(ll.raw[BCA.idx,2]) + sum(ll.raw[ACB.idx,3])
+        ll.BCA <- sum(ll.raw[ABC.idx,3]) +
+            sum(ll.raw[BCA.idx,1]) + sum(ll.raw[ACB.idx,2])
+        ll.ACB <- sum(ll.raw[ABC.idx,3]) +
+            sum(ll.raw[BCA.idx,2]) + sum(ll.raw[ACB.idx,1])
+        ll.BAC <- sum(ll.raw[ABC.idx,1]) +
+            sum(ll.raw[BCA.idx,3]) + sum(ll.raw[ACB.idx,2])
+        ll.CBA <- sum(ll.raw[ABC.idx,2]) +
+            sum(ll.raw[BCA.idx,1]) + sum(ll.raw[ACB.idx,3])
+        ll.CAB <- sum(ll.raw[ABC.idx,2]) +
+            sum(ll.raw[BCA.idx,3]) + sum(ll.raw[ACB.idx,1])
+
+        ll <- c(ll.ABC, ll.BCA, ll.ACB, ll.BAC, ll.CBA, ll.CAB)
+
+        return(-ll[l])
+}
+
+blOptimFuncAdj <- function(par, data, method, cABC, tau2bound, N, theta, l){
+    tau1 <- 0
+    par <- exp(par)
+
+    if(!(par[1] >= 0 & par[1] <= tau2bound)){
+        return(Inf)
+    }
+    if(!(par[2] >= 0 & par[2] <= 4*N/theta)){
+        return(Inf)
+    }
+
+    tau2 <- par[1]
+    m <- par[2]
+    t1.vec <- data[,4]
+    t2.vec <- data[,5]
+
+    ABC.idx <- data[,1] == 1
+    BCA.idx <- data[,2] == 1
+    ACB.idx <- data[,3] == 1
+
+    QAB <- matrix(data = c(-2*m, 0, m, m, 0, 0,
+                           0, -2*m, m, m, 0, 0,
+                           m, m, -2*m-cABC, 0, cABC, 0,
+                           m, m, 0, -2*m-cABC, 0, cABC,
+                           0, 0, 0, 0, -m, m,
+                           0, 0, 0, 0, m, -m), nrow = 6, byrow = TRUE)
+
+    QABC <- matrix(data = c(-3*m-3*(cABC + cABC + cABC), m, m, m, 0, 0, 0,
+                            0, 3*cABC, 0, 0, 0, 3*cABC, 0, 0, 0, 3*cABC, 0, 0,
+                            0, 0, 0, m,-3*m-cABC,0,0,m,m,0,0,0,cABC,0,0,0,0,0,
+                            0,0,0,0,0,0,0,m,0,-3*m-cABC,0,m,0,m,0,0,0,0,0,0,
+                            cABC,0,0,0,0,0,0,0,0,m,0,0,-3*m-cABC,0,m,m,0,0,0,0,
+                            0,0,0,0,0,0,cABC,0,0,0,0,0,m,m,0,-3*m-cABC,0,0,m,0,
+                            0,0,0,0,0,0,0,0,0,cABC,0,0,0,0,m,0,m,0,-3*m-cABC,0,
+                            m,0,0,0,0,0,0,cABC,0,0,0,0,0,0,0,0,0,m,m,0,0,
+                            -3*m-cABC,m,0,0,cABC,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                            m,m,m,-3*m-3*(cABC + cABC + cABC),0,0,0,3*cABC,0,0,
+                            0,3*cABC,0,0,0,3*cABC,0,0,0,0,0,0,0,0,0,0,-2*m-cABC,
+                            m,m,0,0,0,0,0,0,0,0,0,cABC,0,0,0,0,0,0,0,0,0,m,
+                            -2*m,0,m,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,m,0,
+                            -2*m,m,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,m,m,
+                            -2*m-cABC,0,0,0,0,0,0,0,0,0,cABC,0,0,0,0,0,0,0,0,0,
+                            0,0,0,-2*m-cABC,m,m,0,0,0,0,0,cABC,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,m,-2*m,0,m,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                            0,0,0,m,0,-2*m,m,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                            0,0,m,m,-2*m-cABC,0,0,0,0,0,cABC,0,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,0,-2*m-cABC,m,m,0,cABC,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,0,0,0,m,-2*m,0,m,0,0,0,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,0,m,0,-2*m,m,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,m,m,-2*m-cABC,0,cABC,0,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,0,0,0,0,0,-m,m,0,0,0,0,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,0,0,m,-m), nrow = 22, byrow = TRUE)
+
+    QAB <- matrix(unlist(QAB), nrow = 6)
+    QABC <- matrix(unlist(QABC), nrow = 22)
+    epsilon <- 10^(-15)
+    reps <- nrow(data)
+
+    ll.raw <- matrix(rep(NA,3*reps), ncol = 3)
+    for(i in 1:reps){
+        ll.raw[i,1] <- log(f1Grid(t1.vec[i], t2.vec[i],
+                                  tau1, tau2, QAB, QABC, cABC) +
+                               f2Grid(t1.vec[i], t2.vec[i],
+                                      tau1, tau2, QAB, QABC, cABC) + epsilon)
+        ll.raw[i,2] <- log(f3Grid(t1.vec[i], t2.vec[i],
+                                  tau1, tau2, QAB, QABC, cABC) + epsilon)
+        ll.raw[i,3] <- log(f4Grid(t1.vec[i], t2.vec[i],
+                                  tau1, tau2, QAB, QABC, cABC) + epsilon)
+    }
+
+    ll.ABC <- sum(ll.raw[ABC.idx,1]) +
+        sum(ll.raw[BCA.idx,2]) + sum(ll.raw[ACB.idx,3])
+    ll.BCA <- sum(ll.raw[ABC.idx,3]) +
+        sum(ll.raw[BCA.idx,1]) + sum(ll.raw[ACB.idx,2])
+    ll.ACB <- sum(ll.raw[ABC.idx,3]) +
+        sum(ll.raw[BCA.idx,2]) + sum(ll.raw[ACB.idx,1])
+    ll.BAC <- sum(ll.raw[ABC.idx,1]) +
+        sum(ll.raw[BCA.idx,3]) + sum(ll.raw[ACB.idx,2])
+    ll.CBA <- sum(ll.raw[ABC.idx,2]) +
+        sum(ll.raw[BCA.idx,1]) + sum(ll.raw[ACB.idx,3])
+    ll.CAB <- sum(ll.raw[ABC.idx,2]) +
+        sum(ll.raw[BCA.idx,3]) + sum(ll.raw[ACB.idx,1])
+
+    ll <- c(ll.ABC, ll.BCA, ll.ACB, ll.BAC, ll.CBA, ll.CAB)
+
+    return(-ll[l])
+}
+
+

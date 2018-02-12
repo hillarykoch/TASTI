@@ -10,15 +10,12 @@ License: Artistic-2.0
 Encoding: UTF-8
 LazyData: true
 Imports:
-    ape,
     cubature,
     data.table,
     expm,
     magrittr,
     methods,
     purrr,
-    stats,
-    treeio
-Suggests: BiocStyle, knitr, rmarkdown
+    stats
+Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
-biocViews: Software, Genetics, GraphAndNetwork

@@ -1,18 +1,4 @@
-# # This is how you save a newick tree as a variable without writing to a file
-# nwk <- write.tree(phylip@phylo, file = "")
-# phyloApe <- phylip@phylo
-#
-# # Get all rooted triples
-# labs <- phylip@phylo$tip.label
-# triples <- combn(labs, 3)
-#
-# # Unrooted triple will have 1 node
-# # Rooted triple will have 2 nodes
-# outTip <- setdiff(labs, triples[,100])
-# rooted <- drop.tip(phyloApe, outTip)
-# unr <- drop.tip(phyloApe, setdiff(labs, triples[,1]))
-
-buildST <- function(data, m, theta, N = NULL, mBins = 20, tauBins = 20,
+buildST <- function(data, theta, N, mBins = 20, tauBins = 20,
                     gridSearch = TRUE, branchLengths = TRUE, pDiscord = .05,
                     method = "Nelder-Mead", startVals = NULL){
     if(gridSearch & !branchLengths){
@@ -30,9 +16,9 @@ buildST <- function(data, m, theta, N = NULL, mBins = 20, tauBins = 20,
     }
 
     if(gridSearch){
-        gridST(data, m, theta, mBins, tauBins)
+        gridST(data, N, theta, mBins, tauBins)
     } else if(branchLengths){
-        blOptimST(data, m, theta, method, startVals)
+        blOptimST(data, N, theta, method, startVals)
     } else{
         topOptimST(data, theta, method, startVals, N, pDiscord)
     }
@@ -89,4 +75,49 @@ topOptimST <- function(data, theta, method, startVals, N, pDiscord){
                      N = N, tauBound = tauBound, cABC = cABC, l=l)
         mle[l,] <- c(exp(opt$par), opt$value)
     }
+    mle
+}
+
+blOptimST <- function(data, N, theta, method, startVals){
+    cABC <- 2/theta
+    tau1bound <- min(data[,4])
+    tau2bound <- min(data[,5])
+
+    mle <- matrix(rep(NA, 6*4), ncol = 4)
+    colnames(mle) <- c("tau1", "tau2", "m", "nll")
+    rownames(mle) <- c("ABC", "BCA", "ACB", "BAC", "CBA", "CAB")
+
+    for(l in 1:6){
+        if(tau1bound == 0 & tau2bound == 0){
+            # If there is a "star tree"
+            mle[l,] <- c(0,0,NA,-Inf)
+        } else if(tau1bound == 0){
+            # Adjust for tau1bound=0 by fixing tau1 and optimizing over tau2 and m
+            if(is.null(startVals)){
+                startVals <- c(runif(1, min=-7, max = log(tau2bound)), runif(1, min=-7, max=log(4*N/theta)))
+            }
+            opt <- optim(par = startVals, fn = blOptimFuncAdj, data = data,
+                         method = method, cABC = cABC,
+                         tau2bound = tau2bound, N=N, theta=theta, l=l)
+            mle[l,] <- c(0, exp(opt$par), opt$value)
+        } else{
+            if(is.null(startVals)){
+                startVals <- c(runif(1, min = -7, max = log(tau1bound)),
+                               runif(1, min = -7, max = log(tau2bound)),
+                               runif(1, min=-7, max=log(4*N/theta)))
+            }
+
+            if(startVals[2] < startVals[1]){
+                startVals <- startVals[c(2,1,3)]
+            }
+
+            opt <- optim(par = startVals, fn = blOptimFunc, data = data,
+                         method = method, cABC=cABC,
+                         tau1bound=tau1bound, tau2bound=tau2bound,
+                         N=N, theta=theta, l=l)
+
+            mle[l,] <- c(exp(opt$par), opt$value)
+        }
+    }
+    mle
 }

@@ -7,14 +7,14 @@ Build a species tree from gene tree data
 Construct the most likely species tree from gene trees with or without branch lengths, using either \link{optim} or a grid search.
 }
 \usage{
-buildST(data, m, theta, N = NULL, mBins = 20, tauBins = 20,
+buildST(data, theta, N = NULL, mBins = 20, tauBins = 20,
                     gridSearch = TRUE, branchLengths = TRUE, pDiscord = .05,
                     method = "Nelder-Mead", startVals = NULL)
 }
 \arguments{
   \item{data}{Matrix of gene tree triplet information, with or without branch lengths}
-  \item{N}{Effective population size}
   \item{theta}{Population-scaled mutation rate}
+  \item{N}{Effective population size}
   \item{mBins}{Number of bins for migration rate, if using grid search}
   \item{tauBins}{Number of bins for speciation times, if using grid search}
   \item{gridSearch}{Logical. Indicates whether a grid search will be used to optimize}

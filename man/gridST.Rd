@@ -29,7 +29,7 @@ Matrix containing the maximum likelihood parameter estimates and negative log li
 # These can be encoded in the following matrix
 data <- matrix(c(1,0,0,.01,.012,
                  0,1,0,.001,.0035,
-                 0,0,1,0.02,0.03), ncol = 5)
+                 0,0,1,0.02,0.03), ncol = 5, byrow = T)
 
 # Let's say you also have an effective population size N and population-scaled
 # mutation rate theta:
