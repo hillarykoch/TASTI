@@ -1,3 +1,4 @@
 export("buildST")
 export("gridST")
 export("topOptimST")
+export("blOptimST")
