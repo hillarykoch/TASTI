@@ -3,8 +3,11 @@
 This R package uses maximum likelihood methods to construct species trees from gene trees, with or without ancestral population structure.
 
 ## Installation
+Install from GitHub with:
 
-## Getting going
+library(devtools)
+install_github("hillarykoch/powerTCR")
+library(powerTCR)
 
 ## Citation
 
