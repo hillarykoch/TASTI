@@ -1,4 +1,4 @@
-buildST <- function(data, theta, N, mBins = 20, tauBins = 20,
+ buildST <- function(data, theta, N, mBins = 20, tauBins = 20,
                     gridSearch = TRUE, branchLengths = TRUE, pDiscord = .05,
                     method = "Nelder-Mead", startVals = NULL){
     if(gridSearch & !branchLengths){

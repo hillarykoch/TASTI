@@ -33,4 +33,35 @@ pDiscord is relevant when branchLengths = FALSE. This affects the upper bound on
 \seealso{
 \code{\link{topOptimST}}, \code{\link{gridST}}, \code{\link{blOptimST}}
 }
+\examples{
+# Consider you have 3 gene trees, one with these topologies and branch lengths:
+# ((A:0.01, B:0.01):0.002, C:0.012)
+# ((B:0.001, C:0.001):0.0025, A:0.0035)
+# ((A:0.02, C:0.02):0.01, B:0.03)
+# These can be encoded in the following matrix
+data <- matrix(c(1,0,0,.01,.012,
+                 0,1,0,.001,.0035,
+                 0,0,1,0.02,0.03), ncol = 5, byrow = T)
+
+# Let's say you also have an effective population size N and population-scaled
+# mutation rate theta:
+theta <- .005
+N <- 10000
+
+# Builds using a grid search with specified bin numbers
+mle1 <- buildST(data, theta, N, mBins = 4, tauBins = 4)
+
+# Builds using numerical optimization
+mle2 <- buildST(data, data, theta, N, gridSearch = FALSE)
+
+# Builds using topologies
+topo_data <- colSums(data)[1:3]
+\dontrun{
+mle3 <- topOptimST(data, theta, N, gridSearch = FALSE, branchLengths = FALSE)
+}
+
+mle1
+mle2
+mle3
+}
 
