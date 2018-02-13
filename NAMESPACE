@@ -3,3 +3,5 @@ export("gridST")
 export("topOptimST")
 export("blOptimST")
 export("get_mles")
+importFrom(readr, read_table)
+

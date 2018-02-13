@@ -16,6 +16,7 @@ Imports:
     magrittr,
     methods,
     purrr,
+    readr,
     stats
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr

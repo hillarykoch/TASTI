@@ -1,0 +1,74 @@
+---
+title: "TASTI: Taxa with Ancestral structure Species Tree Inference"
+author: "Hillary Koch"
+package: TASTI
+abstract: >
+    This vignette displays a more fleshed out example of how one could use the TASTI package to make species tree inference from a collection of input gene trees. It is not recommended that one run this code on their own computer locally as it can get expensive. However, all results have been computed and will be displayed here.
+output: github_document
+vignette: > 
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}  
+---
+
+A big data set of rooted gene tree triplets in Newick format can be loaded in as follows:
+
+```{r setup, echo = 3:5, message = FALSE}
+library(TASTI)
+library(readr)
+file <- system.file("extdata", "trees.txt", package = "TASTI")
+trees <- read_table(file, col_names = FALSE)
+head(trees)
+```
+
+**NOTE:** if you like the $\texttt{ape}$ package (not required by TASTI), you could also get a "multiPhylo" object by typing:
+
+```{r, eval = FALSE}
+library(ape)
+trees <- ape::read.tree(file)
+```
+
+You'll need to extract the topologies (and branch lengths, if using them) from this data in your favorite manner. I've done it for you on this data set using Python. You can see the parsed version of the trees files saved as data in this package.
+
+```{r}
+# The data on how many of each gene tree topology were observed
+data("topos")
+topos
+```
+
+```{r}
+# The data on each observed gene tree topology with branch lengths
+data("bLens")
+head(bLens)
+```
+
+To use $\texttt{buildST}$, the main function in TASTI, your data must be in these formats!
+
+### You can build a species tree in 3 ways.
+
+First, you could only use the topologies. This method has the advantage of being the most robust, with the downside of omitting crucial information (that is, branch lengths) that could improve inference accuracy. Let's say that previous work has told us that the effective population size $N=5000$ and the population-scaled coalescent rate $\theta = 0.005$. Then, this is done as follows:
+
+```{r, eval = F}
+N <- 5000
+theta = .005
+fit <- buildST(topos, theta, N, gridSearch = FALSE, branchLengths = FALSE)
+```
+
+Second, you can include the branch lengths. This increases accuracy, *assuming your inferred branch lengths are reasonable*. This problem can be handled in two ways. Either using numerical optimization:
+
+```{r, eval = F}
+N <- 5000
+theta = .005
+fit <- buildST(bLens, theta, N, gridSearch = FALSE, branchLengths = TRUE)
+```
+
+or with a grid search. A grid search can get very expensive (depending on fine your grid is) but has the advantage or searching through the non-convex likelihood surface with more accuracy. The grid search is done as follows:
+
+```{r, eval = F}
+N <- 5000
+theta = .005
+fit <- buildST(bLens, theta, N, gridSearch = TRUE, branchLengths = TRUE, mBins = 20, tauBins = 20)
+```
+
+where mBins and tauBins specify the number of "bins" to consider for the migrations rate and speciation times. The larger these numbers, the more accurate your inference will be, but the greater the computational cost, of course.
+
