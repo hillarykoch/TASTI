@@ -46,12 +46,23 @@ To use $\texttt{buildST}$, the main function in TASTI, your data must be in thes
 
 ### You can build a species tree in 3 ways.
 
+It will take some time to do this sort of analysis on 1,000 gene trees. Some pre-computed results using all 3 methods are saved in this package. Load them in by typing:
+
+```{r}
+data("results")
+```
+
 First, you could only use the topologies. This method has the advantage of being the most robust, with the downside of omitting crucial information (that is, branch lengths) that could improve inference accuracy. Let's say that previous work has told us that the effective population size $N=5000$ and the population-scaled coalescent rate $\theta = 0.005$. Then, this is done as follows:
 
 ```{r, eval = F}
 N <- 5000
 theta = .005
 fit <- buildST(topos, theta, N, gridSearch = FALSE, branchLengths = FALSE)
+```
+
+The results should look something like this:
+```{r}
+results$topologies
 ```
 
 Second, you can include the branch lengths. This increases accuracy, *assuming your inferred branch lengths are reasonable*. This problem can be handled in two ways. Either using numerical optimization:
@@ -62,7 +73,12 @@ theta = .005
 fit <- buildST(bLens, theta, N, gridSearch = FALSE, branchLengths = TRUE)
 ```
 
-or with a grid search. A grid search can get very expensive (depending on fine your grid is) but has the advantage or searching through the non-convex likelihood surface with more accuracy. The grid search is done as follows:
+The results look like this:
+```{r}
+results$bLens_with_optim
+```
+
+Or, you can compute with a grid search. A grid search *can* get very expensive (depending on fine your grid is) but has the advantage or searching through the non-convex likelihood surface with more accuracy. The grid search is done as follows:
 
 ```{r, eval = F}
 N <- 5000
@@ -70,5 +86,11 @@ theta = .005
 fit <- buildST(bLens, theta, N, gridSearch = TRUE, branchLengths = TRUE, mBins = 20, tauBins = 20)
 ```
 
-where mBins and tauBins specify the number of "bins" to consider for the migrations rate and speciation times. The larger these numbers, the more accurate your inference will be, but the greater the computational cost, of course.
+where mBins and tauBins specify the number of "bins" to consider for the migrations rate and speciation times. The larger these numbers, the more accurate your inference will be, but the greater the computational cost, of course. The results, when using the bins as specified above, are:
+
+```{r}
+results$bLens_with_gridSearch
+```
+
+In all 3 cases, we infer that the true species tree has the topology ((AB)C). The taxa seem to belong to ancestrally structured populations, with an estimated migration rate between them between 3 and 5 population-scaled migration units.
 

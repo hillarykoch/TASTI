@@ -52,9 +52,9 @@ N <- 10000
 mle1 <- buildST(data, theta, N, mBins = 4, tauBins = 4)
 
 # Builds using numerical optimization
-mle2 <- buildST(data, data, theta, N, gridSearch = FALSE)
+mle2 <- buildST(data, theta, N, gridSearch = FALSE)
 
-# Builds using topologies
+# Builds using only topologies, no branch lengths
 topo_data <- colSums(data)[1:3]
 \dontrun{
 mle3 <- topOptimST(data, theta, N, gridSearch = FALSE, branchLengths = FALSE)
