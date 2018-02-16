@@ -10,9 +10,9 @@ library(devtools)
 install_github("hillarykoch/TASTI")
 library(TASTI)
 ```
-## Development
+## Running TASTI
 
-This package is currently under development. It does not provide all functions necessary for the centrally proposed analyses.
+See the [package vignette](/vignettes/TASTI.Rmd) for an introduction to the main functions implemented in TASTI.
 
 ## Citation
 
