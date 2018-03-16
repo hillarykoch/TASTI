@@ -55,6 +55,11 @@ get_triples <- function(file, branchLengths = TRUE){
         input[i,"t1"] <- t1
         input[i,"t2"] <- t2
     }
+    first <- paste0("((", taxa[2], ",", taxa[3], "),", taxa[1], ");")
+    second <- paste0("((", taxa[1], ",", taxa[3], "),", taxa[2], ");")
+    third <- paste0("((", taxa[1], ",", taxa[2], "),", taxa[3], ");")
+
+    colnames(input) <- c(first, second, third, "t1", "t2")
 
     if(branchLengths){
         input
