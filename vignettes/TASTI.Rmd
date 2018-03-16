@@ -13,33 +13,19 @@ vignette: >
 
 A big data set of rooted gene tree triplets in Newick format can be loaded in as follows:
 
-```{r setup, echo = 3:5, message = FALSE}
+```{r setup, echo = 3, message = FALSE}
 library(TASTI)
 library(readr)
 file <- system.file("extdata", "trees.txt", package = "TASTI")
-trees <- read_table(file, col_names = FALSE)
-head(trees)
 ```
 
-**NOTE:** if you like the $\texttt{ape}$ package (not required by TASTI), you could also get a "multiPhylo" object by typing:
+You'll need to extract the topologies (and branch lengths, if using them) from this data in your favorite manner. Since TASTI is based on rooted triples, the function \texttt{get_triples} can do this for you. It can output data in either of the two formats used by the function \texttt{buildST} to build the species tree. The output format you need depends on how you want to model -- using topologies and branch lengths, or just topologies alone.
 
-```{r, eval = FALSE}
+```{r, echo = 3:4, message = FALSE}
 library(ape)
-trees <- ape::read.tree(file)
-```
-
-You'll need to extract the topologies (and branch lengths, if using them) from this data in your favorite manner. I've done it for you on this data set using Python. You can see the parsed version of the trees files saved as data in this package.
-
-```{r}
-# The data on how many of each gene tree topology were observed
-data("topos")
-topos
-```
-
-```{r}
-# The data on each observed gene tree topology with branch lengths
-data("bLens")
-head(bLens)
+library(stringr)
+topos <- get_triples(file, branchLengths = FALSE)
+bLens <- get_triples(file, branchLengths = TRUE)
 ```
 
 To use $\texttt{buildST}$, the main function in TASTI, your data must be in these formats!
