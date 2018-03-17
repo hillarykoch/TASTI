@@ -1,2 +1,7 @@
+03.17.18
+Additional function get_triples to read in newick files of rooted triples and convert to the format used by TASTI.
+
+————————————————————————
+
 INITIAL RELEASE
 Version 0.99.0

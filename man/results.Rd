@@ -5,7 +5,7 @@
 Pre-computed results to sample analysis in the vignette
 }
 \description{
-Computing this algorithm on 1,000 gene trees can take a while. Here are pre-computed results to demonstrate more thoroughly the use of the package.
+Computing this algorithm on 1,000 gene trees can take a while. Here are sample results on 1,000 gene trees to demonstrate more thoroughly the use of the package.
 }
 \usage{data("results")}
 \format{

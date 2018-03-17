@@ -5,4 +5,5 @@ export("blOptimST")
 export("get_mles")
 export("get_triples")
 importFrom(readr, read_table)
+importFrom(ape, read.tree)
 
