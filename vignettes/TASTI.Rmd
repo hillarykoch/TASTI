@@ -19,7 +19,7 @@ library(readr)
 file <- system.file("extdata", "trees.txt", package = "TASTI")
 ```
 
-You'll need to extract the topologies (and branch lengths, if using them) from this data in your favorite manner. Since TASTI is based on rooted triples, the function \texttt{get_triples} can do this for you. It can output data in either of the two formats used by the function \texttt{buildST} to build the species tree. The output format you need depends on how you want to model -- using topologies and branch lengths, or just topologies alone.
+You'll need to extract the topologies (and branch lengths, if using them) from this data. Since TASTI is based on rooted triples, the function $\texttt{get_triples}$ can do this for you. It can output data in either of the two formats used by the function $\texttt{buildST}$ to build the species tree. The output format you need depends on how you want to model -- using topologies and branch lengths, or just topologies alone.
 
 ```{r, echo = 3:4, message = FALSE}
 library(ape)
@@ -28,7 +28,12 @@ topos <- get_triples(file, branchLengths = FALSE)
 bLens <- get_triples(file, branchLengths = TRUE)
 ```
 
-To use $\texttt{buildST}$, the main function in TASTI, your data must be in these formats!
+To use $\texttt{buildST}$, the main function in TASTI, your data must be in these formats! This is what they look like:
+
+```{r}
+head(topos)
+head(bLens)
+```
 
 ### You can build a species tree in 3 ways.
 
@@ -38,7 +43,7 @@ It will take some time to do this sort of analysis on 1,000 gene trees. Some pre
 data("results")
 ```
 
-First, you could only use the topologies. This method has the advantage of being the most robust, with the downside of omitting crucial information (that is, branch lengths) that could improve inference accuracy. Let's say that previous work has told us that the effective population size $N=5000$ and the population-scaled coalescent rate $\theta = 0.005$. Then, this is done as follows:
+But how can you get something like this? First, you could only use the topologies. This method has the advantage of being the most robust, with the downside of omitting crucial information (that is, branch lengths) that can improve inference accuracy. Let's say that previous work has told us that the effective population size $N=5000$ and the mutation-scaled coalescent rate is inversely proportional to $\theta = 0.005$. Then, this is done as follows:
 
 ```{r, eval = F}
 N <- 5000

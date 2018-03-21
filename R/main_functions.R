@@ -25,6 +25,15 @@
 }
 
 gridST <- function(data, N, theta, mBins, tauBins){
+    colnames(data)[1] %>%
+        gsub(pattern = "\\(", replacement = "") %>%
+        gsub(pattern = "\\)", replacement = "") -> labs
+    spl <- str_split(labs, "")[[1]]
+    commaIdx <- which(spl == ",")
+    A <- paste0(spl[1:(commaIdx[1]-1)], collapse = "")
+    B <- paste0(spl[(commaIdx[1]+1):(commaIdx[2]-1)], collapse = "")
+    C <- paste0(spl[(commaIdx[2]+1):(length(spl)-1)], collapse = "")
+
     cABC <- 2/theta
     upperM <- log(4*N/theta)
 
@@ -47,16 +56,32 @@ gridST <- function(data, N, theta, mBins, tauBins){
     lookup <- data.frame(lookup)
 
     nll <- matrix(rep(NA, 6*nrow(lookup)), ncol = 6)
-    colnames(nll) <- c("ABC", "BCA", "ACB", "BAC", "CBA", "CAB")
+
+    colnames(nll) <- c(paste0("((", A, ",", B, "),", C, ");"),
+                       paste0("((", B, ",", C, "),", A, ");"),
+                       paste0("((", A, ",", C, "),", B, ");"),
+                       paste0("((", B, ",", A, "),", C, ");"),
+                       paste0("((", C, ",", B, "),", A, ");"),
+                       paste0("((", C, ",", A, "),", B, ");"))
+
     for(l in 1:nrow(lookup)){
         nll[l,] <- coarseFunc(par=lookup[l,1:3], data=data, cABC)
     }
     mlEsts <- data.frame(lookup, nll)
-    mle <- extractML(mlEsts)
+    mle <- extractML(mlEsts, rowNames = colnames(nll))
     mle
 }
 
 topOptimST <- function(data, theta, method, startVals, N, pDiscord){
+    names(data)[1] %>%
+        gsub(pattern = "\\(", replacement = "") %>%
+        gsub(pattern = "\\)", replacement = "") -> labs
+    spl <- str_split(labs, "")[[1]]
+    commaIdx <- which(spl == ",")
+    A <- paste0(spl[1:(commaIdx[1]-1)], collapse = "")
+    B <- paste0(spl[(commaIdx[1]+1):(commaIdx[2]-1)], collapse = "")
+    C <- paste0(spl[(commaIdx[2]+1):(length(spl)-1)], collapse = "")
+
     cABC <- 2/theta
     tauBound <- -theta/2*log(3/2*pDiscord)
 
@@ -67,7 +92,12 @@ topOptimST <- function(data, theta, method, startVals, N, pDiscord){
 
     mle <- matrix(rep(NA, 6*3), ncol = 3)
     colnames(mle) <- c("tau", "m", "nll")
-    rownames(mle) <- c("ABC", "BCA", "ACB", "BAC", "CBA", "CAB")
+    rownames(mle) <- c(paste0("((", A, ",", B, "),", C, ");"),
+                        paste0("((", B, ",", C, "),", A, ");"),
+                        paste0("((", A, ",", C, "),", B, ");"),
+                        paste0("((", B, ",", A, "),", C, ");"),
+                        paste0("((", C, ",", B, "),", A, ");"),
+                        paste0("((", C, ",", A, "),", B, ");"))
 
     for(l in 1:6){
         opt <- optim(par = startVals, fn = topFunc,
@@ -79,13 +109,27 @@ topOptimST <- function(data, theta, method, startVals, N, pDiscord){
 }
 
 blOptimST <- function(data, N, theta, method, startVals){
+    colnames(data)[1] %>%
+        gsub(pattern = "\\(", replacement = "") %>%
+        gsub(pattern = "\\)", replacement = "") -> labs
+    spl <- str_split(labs, "")[[1]]
+    commaIdx <- which(spl == ",")
+    A <- paste0(spl[1:(commaIdx[1]-1)], collapse = "")
+    B <- paste0(spl[(commaIdx[1]+1):(commaIdx[2]-1)], collapse = "")
+    C <- paste0(spl[(commaIdx[2]+1):(length(spl)-1)], collapse = "")
+
     cABC <- 2/theta
     tau1bound <- min(data[,4])
     tau2bound <- min(data[,5])
 
     mle <- matrix(rep(NA, 6*4), ncol = 4)
     colnames(mle) <- c("tau1", "tau2", "m", "nll")
-    rownames(mle) <- c("ABC", "BCA", "ACB", "BAC", "CBA", "CAB")
+    rownames(mle) <- c(paste0("((", A, ",", B, "),", C, ");"),
+                       paste0("((", B, ",", C, "),", A, ");"),
+                       paste0("((", A, ",", C, "),", B, ");"),
+                       paste0("((", B, ",", A, "),", C, ");"),
+                       paste0("((", C, ",", B, "),", A, ");"),
+                       paste0("((", C, ",", A, "),", B, ");"))
 
     for(l in 1:6){
         if(tau1bound == 0 & tau2bound == 0){

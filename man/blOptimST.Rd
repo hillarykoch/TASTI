@@ -34,6 +34,7 @@ If the migration rate is significantly large, the populations are effectively un
 data <- matrix(c(1,0,0,.01,.012,
                  0,1,0,.001,.0035,
                  0,0,1,0.02,0.03), ncol = 5, byrow = T)
+colnames(data) <- c("((A,B),C);", "((B,C),A);", "((A,C),B);", "t1", "t2")
 
 # Let's say you also have an effective population size N and population-scaled
 # mutation rate theta:

@@ -31,6 +31,7 @@ data <- list("rep1" = matrix(c(1,0,0,.01,.012,
               "rep3" = matrix(c(0,1,0,.01,.15,
                                 0,1,0,.11,.3,
                                 0,0,1,0.02,0.04), ncol = 5, byrow = TRUE))
+colnames(data) <- c("((A,B),C);", "((B,C),A);", "((A,C),B);", "t1", "t2")
 
 # Fit a model to each replicate. Let's consider using branch lengths with a grid search
 fits <- lapply(data, function(X) gridST(X, N, theta, mBins = 5, tauBins = 5))

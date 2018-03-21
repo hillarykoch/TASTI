@@ -25,6 +25,7 @@ This function takes a vector of counts of observed gene trees and constructs a s
 # Say you've observed each labeling of the gene tree rooted triple
 # 50, 100, and 56 times. Then, you data vector would look like this:
 data <- c(50,100,56)
+names(data) <- c("((A,B),C);", "((B,C),A);", "((A,C),B);")
 
 # Previous analyses may have told you that your taxa have an effective
 # population size of N=10,000, and theta=.01

@@ -9,7 +9,7 @@ Computing this algorithm on 1,000 gene trees can take a while. Here are sample r
 }
 \usage{data("results")}
 \format{
-This is a list of 3 model outputs. The first comes from doing analysis with only topologies, the second with topologies and branch lengths using numerical optimization, and the third with topologies and branch lengths using a grid search.
+This is a sample list of 3 model outputs. The first comes from doing analysis with only topologies, the second with topologies and branch lengths using numerical optimization, and the third with topologies and branch lengths using a grid search.
 }
 \examples{
 data(results)

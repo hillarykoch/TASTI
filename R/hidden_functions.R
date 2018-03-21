@@ -285,11 +285,11 @@ coarseFunc <- function(par, data, cABC){
     return(-ll)
 }
 
-extractML <- function(mlEsts){
+extractML <- function(mlEsts, rowNames){
     optIdx <- -mlEsts[,4:9] %>% t %>% max.col
     mle <- cbind(mlEsts[optIdx,1:3], diag(as.matrix(mlEsts[optIdx,4:9])))
     colnames(mle) <- c(colnames(mle[1:3]), "nll")
-    rownames(mle) <- c("ABC", "BCA", "ACB", "BAC", "CBA", "CAB")
+    rownames(mle) <- rowNames
     mle
 }
 
