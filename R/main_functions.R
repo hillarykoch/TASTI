@@ -86,8 +86,8 @@ topOptimST <- function(data, theta, method, startVals, N, pDiscord){
     tauBound <- -theta/2*log(3/2*pDiscord)
 
     if(is.null(startVals)){
-        startVals <- c(runif(1, min=-7,max=log(tauBound)),
-                       runif(1, min=-7, max=log(4*N/theta)))
+        startVals <- c(runif(1, min=-10,max=log(tauBound)),
+                       runif(1, min=-10, max=log(4*N/theta)))
     }
 
     mle <- matrix(rep(NA, 6*3), ncol = 3)
@@ -138,7 +138,7 @@ blOptimST <- function(data, N, theta, method, startVals){
         } else if(tau1bound == 0){
             # Adjust for tau1bound=0 by fixing tau1 and optimizing over tau2 and m
             if(is.null(startVals)){
-                startVals <- c(runif(1, min=-7, max = log(tau2bound)), runif(1, min=-7, max=log(4*N/theta)))
+                startVals <- c(runif(1, min=-10, max = log(tau2bound)), runif(1, min=-10, max=log(4*N/theta)))
             }
             opt <- optim(par = startVals, fn = blOptimFuncAdj, data = data,
                          method = method, cABC = cABC,
@@ -146,9 +146,9 @@ blOptimST <- function(data, N, theta, method, startVals){
             mle[l,] <- c(0, exp(opt$par), opt$value)
         } else{
             if(is.null(startVals)){
-                startVals <- c(runif(1, min = -7, max = log(tau1bound)),
-                               runif(1, min = -7, max = log(tau2bound)),
-                               runif(1, min=-7, max=log(4*N/theta)))
+                startVals <- c(runif(1, min = -10, max = log(tau1bound)),
+                               runif(1, min = -10, max = log(tau2bound)),
+                               runif(1, min=-10, max=log(4*N/theta)))
             }
 
             if(startVals[2] < startVals[1]){
