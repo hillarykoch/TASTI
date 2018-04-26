@@ -355,11 +355,11 @@ f4Top <- function(t1, tau, cABC, QAB, QABC){
 }
 
 topFunc <- function(par, method, data, theta, N, tauBound, cABC, l){
-    if(!(-7 <= par[1] & par[1] <= log(tauBound))){
+    if(!(-10 <= par[1] & par[1] <= log(tauBound))){
         return(Inf)
     }
 
-    if(!(-7 <= par[2] & par[2] <= 4*N/theta)){
+    if(!(-10 <= par[2] & par[2] <= 4*N/theta)){
         return(Inf)
     }
 
