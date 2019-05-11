@@ -64,7 +64,9 @@ get_triples <- function(file, branchLengths = TRUE){
     if(branchLengths){
         input
     } else{
-        colSums(input)[1:3]
+        rmidx <- input[,"t2"] - input[, "t1"] == 0
+        out <- input[!rmidx,]
+        colSums(out)[1:3]
     }
 }
 
