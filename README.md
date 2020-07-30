@@ -16,4 +16,4 @@ See the [package vignette](/vignettes/TASTI.Rmd) for an introduction to the main
 
 ## Citation
 
-Paper yet to appear.
+Koch, H., & DeGiorgio, M. (2020). Maximum likelihood estimation of species trees from gene trees in the presence of ancestral population structure. *Genome biology and evolution*, 12(2), 3977-3995.
